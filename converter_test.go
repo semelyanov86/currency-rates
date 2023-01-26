@@ -1,37 +1,34 @@
 package main
 
 import (
-	"github.com/jarcoal/httpmock"
-	"io"
-	"os"
-	"strings"
 	"testing"
 )
 
-func TestMainFunc(T *testing.T) {
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-	key := os.Getenv("CURRENCY_API")
+type testWebRequest struct {
+}
 
-	// Exact URL match
-	httpmock.RegisterResponder("GET", "https://free.currconv.com/api/v7/convert?q=USD_RUB,EUR_RUB&compact=ultra&apiKey="+key,
-		httpmock.NewStringResponder(200, `{
+func (t testWebRequest) FetchBytes(url string) ([]byte, error) {
+	return []byte(`{
   "USD_RUB": 46.1,
   "EUR_RUB": 33.4
-}`))
-	rescueStdout := os.Stdout
-	r, w, _ := os.Pipe()
-	os.Stdout = w
+}`), nil
+}
 
-	main()
-	w.Close()
-	out, _ := io.ReadAll(r)
-	os.Stdout = rescueStdout
-
-	if strings.Contains(string(out), "USD_RUB: 46.1") {
-		T.Errorf("Expected contains %s, got %s", "USD_RUB: 46.1", string(out))
+func TestMainFunc(T *testing.T) {
+	cfg := CurrencySource{
+		Parent:  "RUB",
+		Target:  "",
+		Targets: []string{"EUR", "USD"},
+		Key:     "12342134",
 	}
-	if strings.Contains(string(out), "EUR_RUB: 33.4") {
-		T.Errorf("Expected contains %s, got %s", "EUR_RUB: 33.4", string(out))
+	got, err := getRates(testWebRequest{}, cfg)
+	if err != nil {
+		T.Fatal(err)
+	}
+	if got["USD_RUB"] != 46.1 {
+		T.Errorf("Expected contains %s, got %f", "USD_RUB: 46.1", got["USD_RUB"])
+	}
+	if got["EUR_RUB"] != 33.4 {
+		T.Errorf("Expected contains %s, got %f", "EUR_RUB: 33.4", got["USD_RUB"])
 	}
 }
