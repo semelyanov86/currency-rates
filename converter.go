@@ -23,6 +23,7 @@ func main() {
 	var convertResult ConvertResult
 	flag.StringVar(&cfg.Parent, "parent", "RUB", "Code of parent currency")
 	flag.StringVar(&cfg.Target, "targets", "USD,EUR", "Code of target currency, devided by comma")
+	flag.Parse()
 	key := os.Getenv("CURRENCY_API")
 	cfg.Targets = strings.Split(cfg.Target, ",")
 	var q string
