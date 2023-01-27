@@ -5,9 +5,10 @@ Script for showing currency lists for conky app.
 
 Example usage:
 
-1. Create crontab entry `*/15 * * * * ~/converter > ~/curren.log`
-2. Set environment variable: `CURRENCY_API=`. To get converter API key, visit website: www.currencyconverterapi.com
-3. Add rule for conky:
+1. Download the latest version from releases tab.
+2. Create crontab entry `*/15 * * * * ~/currency-rates > ~/curren.log`
+3. Set environment variable: `CURRENCY_API=`. To get converter API key, visit website: www.currencyconverterapi.com
+4. Add rule for conky:
 ```bash
 ${font Entopia:bold:size=12}${color 34a8eb}CURRENCY RATES ${hr 2}$color
 ${offset 0}${font Noto Sans:size=10}${execi 500 cat /data/sergeyem/currency-rates/curren.log}
