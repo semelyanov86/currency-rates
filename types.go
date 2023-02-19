@@ -1,5 +1,7 @@
 package main
 
+import "context"
+
 type ConvertResult map[string]float64
 
 type CurrencySource struct {
@@ -10,5 +12,5 @@ type CurrencySource struct {
 }
 
 type GetWebRequest interface {
-	FetchBytes(url string) ([]byte, error)
+	FetchBytes(ctx context.Context, url string) ([]byte, error)
 }

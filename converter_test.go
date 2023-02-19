@@ -1,13 +1,14 @@
 package main
 
 import (
+	"context"
 	"testing"
 )
 
 type testWebRequest struct {
 }
 
-func (t testWebRequest) FetchBytes(url string) ([]byte, error) {
+func (t testWebRequest) FetchBytes(ctx context.Context, url string) ([]byte, error) {
 	return []byte(`{
   "USD_RUB": 46.1,
   "EUR_RUB": 33.4

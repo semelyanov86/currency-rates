@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -9,13 +10,14 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 type LiveGetWebRequest struct {
 }
 
-func (receiver LiveGetWebRequest) FetchBytes(url string) ([]byte, error) {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+func (receiver LiveGetWebRequest) FetchBytes(ctx context.Context, url string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -40,12 +42,14 @@ func (receiver LiveGetWebRequest) FetchBytes(url string) ([]byte, error) {
 func getRates(getWebRequest GetWebRequest, cfg CurrencySource) (ConvertResult, error) {
 	var q string
 	var result ConvertResult
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
 	for _, target := range cfg.Targets {
 		q = q + "," + target + "_" + cfg.Parent
 	}
 	q = strings.Trim(q, ",")
 	url := "https://free.currconv.com/api/v7/convert?q=" + q + "&compact=ultra&apiKey=" + cfg.Key
-	body, err := getWebRequest.FetchBytes(url)
+	body, err := getWebRequest.FetchBytes(ctx, url)
 	if err != nil {
 		return result, err
 	}
